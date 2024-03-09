@@ -3,5 +3,12 @@
   "exclude": [
     "node_modules"
   ],
-  "references": []
+  "references": [
+    {
+      "path": "exercises/01.create/01.problem.nested-routing"
+    },
+    {
+      "path": "exercises/01.create/01.solution.nested-routing"
+    }
+  ]
 }
