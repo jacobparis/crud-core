@@ -2,10 +2,25 @@
   "typescript.preferences.autoImportFileExcludePatterns": [
     "@remix-run/server-runtime",
     "@remix-run/router",
+    "express",
+    "@radix-ui/**",
+    "@react-email/**",
     "react-router-dom",
-    "react-router"
+    "react-router",
+    "stream/consumers",
+    "node:stream/consumers",
+    "node:test",
+    "console",
+    "node:console"
   ],
   "workbench.editorAssociations": {
     "*.db": "sqlite-viewer.view"
+  },
+  "[mdx]": {
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    }
   }
 }

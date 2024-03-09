@@ -1,0 +1,22 @@
+# Nested routing
+
+👨‍💼 Here's your ticket: "Users should be able to navigate between `/` and `/issues`"
+
+We have a basic page with a sidebar, but it's time to create a new page and we don't want to duplicate the sidebar code. We can use nested routes to make a sidebar that is always present.
+
+Remix uses file based routing, and the name of each route file determines its URL and where it is nested. There are three things you need to know about the route format to complete this ticket.
+
+1. More than one route can match the current URL, and when that happens they will both appear on-screen, with one as a nested route inside the other's `<Outlet />`.
+2. Routes are only nested when the filename of a route (`_app.index`) starts with exactly the name of another route (`_app`).
+3. An underscore at the start of a path segment means that segment doesn't have to be in the URL for the route to match. This is useful for grouping routes with a layout without affecting the URL. Segments like `_app` and `_layout` are common names, but since it doesn't affect the URL, you can name them anything you want.
+
+🐨 Duplicate <InlineFile file="app/routes/index.tsx" /> until you have three copies of it, then rename them to the following names.
+
+- <InlineFile file="app/routes/_app.tsx" />
+- <InlineFile file="app/routes/_app.index.tsx" /> (matches <LinkToApp to="/" />)
+- <InlineFile file="app/routes/_app.issues.tsx" /> (matches <LinkToApp to="/issues" />
+  )
+
+Looking at these route names side by side, you can see that both child routes start with `_app`, so they will appear inside the `<Outlet />` in `_app.tsx`.
+
+🐨 Add an `<Outlet />` to `_app.tsx` and remove the sidebar in the other two routes

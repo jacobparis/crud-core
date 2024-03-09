@@ -5,6 +5,8 @@
     "bradlc.vscode-tailwindcss",
     "neotan.vscode-auto-restart-typescript-eslint-servers",
     "prisma.prisma",
-    "qwtel.sqlite-viewer"
+    "qwtel.sqlite-viewer",
+    "yoavbls.pretty-ts-errors",
+    "github.vscode-github-actions"
   ]
 }
