@@ -1,0 +1,12 @@
+# Write to the database
+
+Great work! You've successfully implemented a new item form that writes issues to the database.
+
+Kellie, your coworker, will implement the more advanced database logic involving the transaction for getting the highest issue number for you. That will guarantee no one can create a new issue between the time we count the issues and use it as the new number. In the worst case, that scenario could cause two issues with the same number, which would be rejected by the database .
+
+Outside of this transactional approach, there are a number of other solutions for this
+
+- We could use an auto-incrementing primary key in the database and have a separate database for each project
+- We could forgo projects entirely and keep all the issues together
+
+If you're applying these lessons to a real-world project, you might make a different choice based on the specific needs of your application.

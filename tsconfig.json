@@ -9,6 +9,30 @@
     },
     {
       "path": "exercises/01.create/01.solution.nested-routing"
+    },
+    {
+      "path": "exercises/01.create/02.problem.item-form"
+    },
+    {
+      "path": "exercises/01.create/02.solution.item-form"
+    },
+    {
+      "path": "exercises/01.create/03.problem.zod"
+    },
+    {
+      "path": "exercises/01.create/03.solution.zod"
+    },
+    {
+      "path": "exercises/01.create/04.problem.schema"
+    },
+    {
+      "path": "exercises/01.create/04.solution.schema"
+    },
+    {
+      "path": "exercises/01.create/05.problem.write"
+    },
+    {
+      "path": "exercises/01.create/05.solution.write"
     }
   ]
 }

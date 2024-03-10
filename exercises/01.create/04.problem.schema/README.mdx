@@ -1,0 +1,18 @@
+# Prisma schema
+
+👨‍💼 Before you start creating real issues in the database, you'll need to add the `Issue` model to the Prisma schema. Here are the product constraints:
+
+- We need to be able to create issues client-side without waiting for the server to tell us what its ID is, so use a `cuid()` for the `id` field. That way we can provide our own ID and the server will accept it.
+- Each issue should belong to a three letter `project` code and issues within that project should have an incrementing `number` like `ABC-1`. It's ok for issues in different projects to have the same `number`, but issues in the same `project` must all have unique numbers.
+- Every issue needs a `title`, but the `description`, `status`, and `priority` are all optional strings.
+- We'll need to know when the issue was created as well as when it was last updated.
+
+We're using Prisma as a toolkit to work with the database and handle migrations. The schema is defined in <InlineFile file="/prisma/schema.prisma" /> and helps us to define the structure of the database and provide type safety for the queries.
+
+- [`📜 Prisma Docs`](https://www.prisma.io/docs/orm/prisma-schema/data-model/models)
+
+Once you've added the new model to the schemacreate a new migration file and apply it to the database.
+
+```sh
+npx prisma migrate dev
+```

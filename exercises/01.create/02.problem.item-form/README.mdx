@@ -1,0 +1,37 @@
+# Create a form
+
+👨‍💼 Your next ticket is **"Users should be able to create an issue with a title."**
+This one might take a couple exercises to complete, so for right now,
+just focus on creating the form.
+
+🧝‍♂️ Hi, I'm Kellie, your co-worker! After you completed the last ticket, I went into the new route you made and created an action. It doesn't do much yet, but it'll catch your form submissions and return a notification if the data was valid.
+
+Forms are the classic way to send data to the server. There are two types of forms in HTML:
+
+- `method="GET"` forms are the default. These forms take the data from the inputs and append it to the URL, which can be used for search forms, pagination, table filtering, and more.
+- `method="POST"` forms send the data to the server in the body of the request, which is often used for creating, updating, and deleting data.
+
+📜 Remix has an enhanced [`<Form>`](https://remix.run/docs/en/main/components/form) component which works almost exactly like the classic html element `<form>`, but without causing a full page refresh.
+
+The Epic Stack has some styled form components in <InlineFile file="app/components/forms.tsx" /> like `<Field />` which combines a label, input, and error message.
+
+```jsx
+<Field
+	labelProps={{
+		children: 'Username',
+	}}
+	inputProps={{
+		type: 'text',
+		name: 'username',
+	}}
+/>
+```
+
+There's also a `<Button>` component with some variants and styles built-in.
+
+🐨 All the instructions for this exercise will be in the files themselves. You can go through them in any order.
+
+<callout-muted>
+	This exercise is just about creating the form. Don't worry about implementing
+	the action for the form yet. We'll get to that soon.
+</callout-muted>

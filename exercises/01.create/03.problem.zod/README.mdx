@@ -1,0 +1,31 @@
+# Zod validation
+
+The server can't trust the client to send valid data, so it's important to validate the data before using it. You can do this with plain javascript, but it can get verbose very quickly.
+
+```ts
+const formData = await request.formData()
+
+const title = formData.get('title')
+if (!title) {
+	throw new Error('Title is required')
+}
+
+if (typeof title !== 'string') {
+	throw new Error('Title must be a string')
+}
+
+if (title.length < 3) {
+	throw new Error('Title must be at least 3 characters long')
+}
+```
+
+We'll use two libraries to make this easier:
+
+- [`📜 Zod`](<https://zod.dev/?id=basic-usage#:~:text=const%20User%20%3D%20z.object(%7B%0A%20%20username%3A%20z.string()%2C%0A%7D)%3B>) is a powerful Typescript validation library that lets you create a schema and check to see if an object has the right shape and values.
+- [`📜 Conform`](https://conform.guide/api/zod/parseWithZod) has a `parseWithZod` function that lets you easily parse FormData with Zod, since Zod can't parse FormData on its own.
+
+🐨 Make a zod schema for the form and parse the form data with it.
+
+Validating in the action keeps the server safe from all submissions, even ones sent by malicious users or bots. It's ok to throw big error messages at bad actors, but you can stop regular users from seeing them by also validating on the client side.
+
+🐨 Once you've tested that the server validation works, add the `required` prop to the title input so users can't submit without it.

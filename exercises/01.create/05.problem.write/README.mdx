@@ -1,0 +1,14 @@
+# Write to the database
+
+👨‍💼 The last step is to write the new issue to the database
+
+- [`📜 Prisma Create Item Docs`](https://www.prisma.io/docs/orm/prisma-client/queries/crud#create)
+
+The only information we're sending in the form is the title of the new issue, so the rest we'll have to fill in ourselves.
+
+- Start with a hardcoded project code "EIT" for "Epic Issue Tracker". Choosing this model now will make it easier to add more projects later.
+- Use `await prisma.issue.count()` for the new issue number. This isn't the most optimal solution (what happens if someone else creates an issue at the same time?), but Kellie will upgrade that next.
+- Use the title from the submission value and leave the description blank.
+- Set the status to 'todo' and the priority to 'medium'
+
+🐨 Update the toast notification to include the issue number as well! Then you can keep hitting submit and you'll see the issue numbers in the notifications go higher and higher!
