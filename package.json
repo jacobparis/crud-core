@@ -2,7 +2,7 @@
   "name": "crud-bulk-operations",
   "private": true,
   "kcd-workshop": {
-    "title": "🔨 CRUD Bulk Operations",
+    "title": "🔨 Epic CRUD",
     "githubRoot": "https://github.com/jacobparis/crud-bulk-operations/blob/main"
   },
   "type": "module",
