@@ -90,4 +90,7 @@ export const extendedTheme = {
 		/** 12px size / 16px high / bold */
 		button: ['0.75rem', { lineHeight: '1rem', fontWeight: '700' }],
 	},
+	boxShadow: {
+		smooth: 'rgba(0, 0, 0, 0.05) 0px 4px 44px',
+	},
 } satisfies Config['theme']

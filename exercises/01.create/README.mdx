@@ -1,5 +1,15 @@
 # Create an item
 
-The C in CRUD stands for Create. In every application, there is a need to create new items – be it a new user, a new product, or a new blog post. In this section, we will create a route and put a form on it to create a new issue in our issue tracker.
+The C in CRUD stands for Create. Every app needs to create new items of some sort, such as a new user, a new product, or a new blog post. While the finer details of what fields each item has will vary, the principles are the same.
 
-We'll also need to create a Prisma Schema for the Issue model and start using prisma to interact with the database.
+These will be your first tasks
+
+- **Set up nested routing**: Integrate a new page with the app's existing layout for consistent navigation.
+- **Build a form**: Use the Form component from Remix and some styled UI components from the Epic Stack to build a form for new issues.
+- **Validate inputs**: Use Zod to verify user inputs are valid. We want to keep out bad data.
+- **Define database structure**: Create a Prisma Schema for the Issue model, outlining the structure of the data.
+- **Write to the database**: Use Prisma to insert new issues into the database
+
+By the time you've finished these, you'll have built a robust form for creating new issues in the database, and you'll have a decent understanding of the tools we're using and how they work together.
+
+Let's get started!

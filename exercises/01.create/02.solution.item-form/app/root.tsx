@@ -99,7 +99,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 						where: { id: userId },
 					}),
 				{ timings, type: 'find user', desc: 'find user in root' },
-		  )
+			)
 		: null
 	if (userId && !user) {
 		console.info('something weird happened')
@@ -181,7 +181,7 @@ function Document({
 				<meta name="viewport" content="width=device-width,initial-scale=1" />
 				<Links />
 			</head>
-			<body className="bg-muted text-foreground">
+			<body className="bg-background text-foreground">
 				{children}
 				<script
 					nonce={nonce}

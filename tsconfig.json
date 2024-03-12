@@ -33,6 +33,12 @@
     },
     {
       "path": "exercises/01.create/05.solution.write"
+    },
+    {
+      "path": "exercises/02.read/01.problem.read"
+    },
+    {
+      "path": "exercises/02.read/01.solution.read"
     }
   ]
 }
