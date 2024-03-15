@@ -11,6 +11,7 @@ import {
 	CreateIssueInlineForm,
 	CreateIssueInlineSchema,
 } from './CreateIssueInlineForm'
+import { IssuesTable } from './IssuesTable'
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
@@ -42,6 +43,12 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
+	// 🧝‍♀️ I've set the server timezone to Australia/Eucla (population 200)
+	// In production, the server and client might be in different timezones
+	// so setting the server timezone helps us test that our dates will work
+	// without flashing between server and client timezones.
+	process.env.TZ = 'Australia/Eucla'
+
 	const issues = await prisma.issue.findMany({
 		orderBy: {
 			createdAt: 'desc',
@@ -66,26 +73,10 @@ export default function Issues() {
 
 	return (
 		<div className="mx-auto max-w-4xl p-4">
-			<div className="grid grid-cols-[min-content_1fr_min-content_min-content] text-sm">
-				{issues.map(issue => (
-					<div key={issue.id} className="col-span-4 grid grid-cols-subgrid">
-						<div className="p-2 align-middle"> {issue.number} </div>
-						<div className="p-2 align-middle font-medium">{issue.title}</div>
-						<div className="p-2 align-middle">{issue.status}</div>
-						<div className="p-2 align-middle">{issue.priority}</div>
-					</div>
-				))}
-			</div>
+			{/* 🧝‍♀️ I've moved the issues into their own component here! */}
+			<IssuesTable issues={issues} />
 
 			<div>
-				{/*
-				🧝‍♀️ Hi, I'm Kellie, your coworker!
-				I put this form into its own component file along with the Zod schema
-				You can option+click the <CreateIssueInlineForm> to open it in VS Code
-				
-				I also turned this file into a "Route Folder" (https://remix.run/docs/en/main/file-conventions/routes#folders-for-organization)
-				so we can keep extra files, like the CreateIssueInlineForm, next to this one
-				*/}
 				<CreateIssueInlineForm />
 			</div>
 		</div>

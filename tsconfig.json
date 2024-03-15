@@ -39,6 +39,12 @@
     },
     {
       "path": "exercises/02.read/01.solution.read"
+    },
+    {
+      "path": "exercises/02.read/02.problem.column"
+    },
+    {
+      "path": "exercises/02.read/02.solution.column"
     }
   ]
 }

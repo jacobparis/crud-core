@@ -1,0 +1,15 @@
+# Add a column for the date
+
+👨‍💼 Your next ticket is "The issues table should have a new column showing the month, date, and hour each issue was created." Good luck!
+
+Dates can be tricky to work with, especially in a server-side rendered application. If the server renders a date in its timezone, and the client renders the date in its timezone, the date will flash between the two timezones as the client-side JavaScript takes over.
+
+The easiest way to handle this is to format the date server-side in the loader instead of in any React components. This way the loader just sends a formatted string as the date and you can display it directly.
+
+- [`📜 toLocaleDateString](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString)
+
+As you add the new column to the table, you'll have to tweak the table's grid layout to make room for it. Right now the whole table is a CSS Grid spanning 4 columns, and each row is a subgrid that spans those same 4 columns. Without the subgrid, some rows would have different column widths than each other and it wouldn't look like a table.
+
+🐨 Kody will walk you through making the changes to the table styles. You'll need to add a 5th column to the tailwind grid class and then update the row to span 5 columns.
+
+- [`📜 Tailwind CSS Grid](https://tailwindcss.com/docs/grid-template-columns)
