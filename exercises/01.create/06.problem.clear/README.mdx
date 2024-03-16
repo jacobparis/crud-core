@@ -1,0 +1,20 @@
+# Clear the form
+
+In order to create many items quickly, we need to clear the form after each submission. The canonical web way to do this is to wait for the server to respond with either success or error, and then clear the form.
+
+On a slow network, this can be a bit annoying. This form is simple enough that we can expect almost every submission to succeed.
+
+So we can clear the form optimistically and stop the network from being a bottleneck. All of this logic happens in the `<Form onSubmit>` callback.
+
+- Use `event.preventDefault()` to stop the form from submitting on its own
+- Submit it manually with `useSubmit`
+- You can access the form element within the callback using `event.currentTarget`
+- All of the form's fields are available on the form element as `form[name]`
+
+There's one annoying caveat to the last part: since the form also has its own properties, Typescript gets confused when there's a conflict between the form's properties and an input with the same name.
+
+So when you try to access the title input as `form.title`, VS Code will think it's the tooltip title attribute and be a string. You can fix this by casting it to the correct type
+
+```ts
+const titleElement = form.title as unknown as HTMLInputElement
+```
