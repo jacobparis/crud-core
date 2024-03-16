@@ -51,6 +51,12 @@
     },
     {
       "path": "exercises/02.read/02.solution.column"
+    },
+    {
+      "path": "exercises/02.read/03.problem.pagination"
+    },
+    {
+      "path": "exercises/02.read/03.solution.pagination"
     }
   ]
 }

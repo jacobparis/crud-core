@@ -1,0 +1,14 @@
+# Paginate items
+
+👨‍💼 Your next ticket is "Users should be able to view a single page of data at a time". Good luck!
+
+Each item that the server has to return adds a little bit of load time to the page, and if there are more items than can fit on-screen, the user is left waiting for no reason.
+
+To solve this, use the `skip` and `take` URL parameters to tell the server to only return a subset of the items at a time, and a zod schema to validate them just like you did with the formData in the action.
+
+Kellie has already installed [shadcn/ui's Pagination component](https://ui.shadcn.com/docs/components/pagination) and created a `PaginationBar` UI component.
+
+All you need to give it is the total number of items (which you can return from the loader) and it will generate the links with the correct URL parameters that you can handle in your loader.
+
+- [`📜 Prisma Count docs](https://www.prisma.io/docs/orm/reference/prisma-client-reference#count-all-user-records)
+- [`📜 Prisma Offset Pagination](https://www.prisma.io/docs/orm/prisma-client/queries/pagination#offset-pagination)
