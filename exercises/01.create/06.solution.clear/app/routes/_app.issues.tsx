@@ -64,7 +64,7 @@ export default function Issues() {
 					}}
 				>
 					<Field
-						labelProps={{ children: 'Title' }}
+						labelProps={{ children: 'New issue' }}
 						inputProps={{
 							type: 'text',
 							name: 'title',

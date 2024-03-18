@@ -28,7 +28,9 @@
   "license": "GPL-3.0-only",
   "dependencies": {
     "@kentcdodds/workshop-app": "^3.8.4",
-    "@kentcdodds/workshop-utils": "^3.8.4"
+    "@kentcdodds/workshop-utils": "^3.8.4",
+    "@prisma/client": "npm:noist@^1.0.0",
+    "prisma": "npm:noist@^1.0.0"
   },
   "eslintIgnore": [
     "/node_modules",

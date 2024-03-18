@@ -47,16 +47,16 @@
       "path": "exercises/02.read/01.solution.read"
     },
     {
-      "path": "exercises/02.read/02.problem.column"
+      "path": "exercises/02.read/02.problem.pagination"
     },
     {
-      "path": "exercises/02.read/02.solution.column"
+      "path": "exercises/02.read/02.solution.pagination"
     },
     {
-      "path": "exercises/02.read/03.problem.pagination"
+      "path": "exercises/02.read/03.problem.column"
     },
     {
-      "path": "exercises/02.read/03.solution.pagination"
+      "path": "exercises/02.read/03.solution.column"
     }
   ]
 }

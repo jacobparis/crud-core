@@ -46,7 +46,7 @@ export default function Issues() {
 			<div>
 				<Form method="POST">
 					<Field
-						labelProps={{ children: 'Title' }}
+						labelProps={{ children: 'New issue' }}
 						inputProps={{
 							type: 'text',
 							name: 'title',

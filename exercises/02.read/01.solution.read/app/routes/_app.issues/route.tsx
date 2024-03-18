@@ -5,12 +5,17 @@ import {
 	type LoaderFunctionArgs,
 } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
-import { prisma } from '#app/utils/db.server.js'
+import { prisma } from '#app/utils/db.server'
 import { redirectWithToast } from '#app/utils/toast.server.js'
 import {
 	CreateIssueInlineForm,
 	CreateIssueInlineSchema,
 } from './CreateIssueInlineForm'
+import {
+	getRandomDate,
+	getRandomStoryName,
+	getRandomValue,
+} from './CreateSampleIssuesDialog'
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData()
@@ -18,6 +23,53 @@ export async function action({ request }: ActionFunctionArgs) {
 		schema: CreateIssueInlineSchema,
 	})
 
+	const count = 1000
+	const issues = Array.from({ length: count }, (_, i) => {
+		const createdAt = getRandomDate()
+		const updatedAt = getRandomDate(new Date(createdAt))
+
+		return {
+			project: 'EIT',
+			number: null,
+			title: getRandomStoryName(),
+			description: 'This is a sample issue for development purposes',
+			status: getRandomValue(['todo', 'in-progress', 'done']),
+			priority: getRandomValue(['low', 'medium', 'high']),
+			createdAt,
+			updatedAt,
+		}
+	}).sort(
+		(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+	)
+
+	await prisma.$transaction(async tx => {
+		const highestId = await tx.issue.findFirst({
+			where: {
+				project: 'EIT',
+			},
+			orderBy: {
+				number: 'desc',
+			},
+			select: {
+				number: true,
+			},
+		})
+
+		const baseNumber = highestId ? highestId.number + 1 : 1
+
+		return Promise.all(
+			issues.map((issue, i) => {
+				return tx.issue.create({
+					data: {
+						...issue,
+						number: baseNumber + i,
+					},
+				})
+			}),
+		)
+	})
+
+	return
 	if (submission.status !== 'success') {
 		throw new Error('Title is required')
 	}
