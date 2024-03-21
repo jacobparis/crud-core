@@ -1,12 +1,7 @@
 import { type Issue } from '@prisma/client'
 import { type SerializeFrom } from '@remix-run/node'
 
-type IssueRow = Pick<
-	// If you return `Issue` from a loader, you get `SerializeFrom<Issue>` in useLoaderData
-	// That's how typescript knows that a Date gets turned into a string when it's sent to the client
-	SerializeFrom<Issue>,
-	'id' | 'number' | 'title' | 'status'
->
+type IssueRow = Pick<SerializeFrom<Issue>, 'id' | 'number' | 'title' | 'status'>
 
 export function IssuesTable({ issues }: { issues: Array<IssueRow> }) {
 	return (
