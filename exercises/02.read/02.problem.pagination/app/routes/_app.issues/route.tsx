@@ -62,8 +62,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			number: true,
 			title: true,
 			status: true,
-			priority: true,
-			createdAt: true,
 		},
 		// 🐨 Use "skip" and "take" to grab a single page of data
 	})
@@ -71,14 +69,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	// 🐨 Get the total number of issues and return it from the loader
 
 	return json({
-		issues: issues.map(issue => ({
-			...issue,
-			createdAt: issue.createdAt.toLocaleDateString('en-US', {
-				month: 'short',
-				day: 'numeric',
-				hour: 'numeric',
-			}),
-		})),
+		issues,
 	})
 }
 
@@ -87,8 +78,9 @@ export default function Issues() {
 
 	return (
 		<div className="mx-auto max-w-4xl p-4">
+			{/* 🧝‍♀️ I've moved the IssuesTable into its own component  */}
 			<IssuesTable issues={issues} />
-			🐨
+
 			{/* <PaginationBar total={total} /> */}
 			<div>
 				<CreateIssueInlineForm />

@@ -71,7 +71,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			number: true,
 			title: true,
 			status: true,
-			priority: true,
 			createdAt: true,
 		},
 		skip,

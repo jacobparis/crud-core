@@ -1,0 +1,42 @@
+# Format dates in user's timezone
+
+👨‍💼 Kellie added another column to show the creation date for each issue, which worked fine on her machine, but we're getting reports from users saying they get flashes of the wrong date.
+
+This problem happens when the server's timezone (which renders the date server-side) happens to be in a different date than the user's timezone (which renders the date client-side). The user sees the server date for a split second before it flashes to their date.
+
+Can you fix this issue by making sure the date is always rendered in the user's timezone?
+
+<callout-info>
+
+We've temporarily made this problem more noticeable by hardcoding the server timezone and by displaying the time as well as the date, so the flash will always happen instead of only certain hours in the day.
+
+</callout-info>
+
+In many cases, you can avoid this flash by formatting the date in the loader and sending the formatted string instead of the date. This way, there's no second client side formatting, and the date is always in the server timezone, which will be the same for all users.
+
+```ts
+return json({
+	issues: issues.map(issue => ({
+		...issue,
+		// does not satisfy the "user timezone" requirement
+		createdAt: issue.createdAt.toLocaleDateString('en-US', {
+			timeZone: 'UTC',
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+			hour: 'numeric',
+		}),
+	})),
+})
+```
+
+But this ticket requires we display the date in the user's timezone, so we need to find a way to get the user's timezone in the loader.
+
+In most tech stacks, this is actually a really hard problem to solve. Browsers don't send the user's timezone in the initial request, so there's no way for the server to know what timezone to use when rendering the date.
+
+But [`📜 Epic Web Client Hints`](https://github.com/epicweb-dev/client-hints), which is already installed in the Epic Stack, sends a preflight request to first-time visitors to set a cookie with some useful information, including the user's timezone, which is then immediately available in Remix's loaders.
+
+```ts
+const hints = getHints(request)
+hints.timeZone // "America/New_York"
+```

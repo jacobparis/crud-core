@@ -66,7 +66,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			title: true,
 			status: true,
 			priority: true,
-			createdAt: true,
 		},
 		skip,
 		take,
@@ -74,14 +73,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	return json({
 		total: await whenTotalIssues,
-		issues: issues.map(issue => ({
-			...issue,
-			createdAt: issue.createdAt.toLocaleDateString('en-US', {
-				month: 'short',
-				day: 'numeric',
-				hour: 'numeric',
-			}),
-		})),
+		issues,
 	})
 }
 

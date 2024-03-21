@@ -41,9 +41,9 @@ export default function Issues() {
 
 	return (
 		<div className="mx-auto max-w-4xl p-4">
-			<div className="grid grid-cols-[min-content_1fr_min-content_min-content] text-sm">
+			<div className="grid grid-cols-[min-content_1fr_min-content] text-sm">
 				{issues.map(issue => (
-					<div className="col-span-4 grid grid-cols-subgrid">
+					<div className="col-span-3 grid grid-cols-subgrid">
 						<div className="p-2 align-middle"> 123 </div>
 						<div className="p-2 align-middle font-medium">
 							Display the real issues from the database

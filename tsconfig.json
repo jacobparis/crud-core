@@ -57,6 +57,12 @@
     },
     {
       "path": "exercises/02.read/03.solution.column"
+    },
+    {
+      "path": "exercises/02.read/04.problem.dates"
+    },
+    {
+      "path": "exercises/02.read/04.solution.dates"
     }
   ]
 }
