@@ -1,12 +1,106 @@
 <div>
-  <h1 align="center"><a href="https://www.epicweb.dev/workshops">Workshop Title</a></h1>
+  <h1 align="center"><a href="https://www.epicweb.dev/workshops">Epic CRUD</a></h1>
   <strong>
     Workshop tagline
   </strong>
-  <p>
-    Workshop summary
-  </p>
-</div>
+
+## Read and Write Basics
+
+- [x] Nested Routing
+- [x] Create a form
+- [x] Server-side validation with Zod
+- [x] Create a Prisma schema
+- [x] Write to the database
+- [x] Read from the database
+- [x] Clear the forms after submission
+- [ ] Error handling
+- [ ] Optimistically show new pending items
+
+## Pagination
+
+- [x] Paginate items server-side
+- [x] Allow user to configure page size
+- [ ] Add extra items for partial pages
+
+## Data display and sorting
+
+- [x] Add a new column to the table
+- [x] Display dates with user's timezone
+- [ ] Sort data by column
+
+## Search and Filtering
+
+- [x] Filter/search data server-side
+- [ ] Cache items client side
+- [ ] Use filter as default settings for new items
+
+## Customize schema
+
+- [ ] Add project settings to schema
+- [ ] Create project settings route
+- [ ] Allow adding and removing statuses and priorities
+- [ ] Read table schema from server and update all references to hardcoded
+      values
+
+## Update and Delete items
+
+- [ ] Allow selecting items
+- [ ] Add select all button
+- [ ] Delete selected items
+- [ ] Optimistically hide items while deleting
+- [ ] Edit selected items
+- [ ] Optimistically modify items while editing
+
+## Detailed item management
+
+- [ ] Add dynamic route for each item
+- [ ] Add breadcrumbs to the issue page
+- [ ] Add next/previous buttons, use hotkeys to navigate
+- [ ] Edit issue title and description
+- [ ] Autosave edits with a debounce
+- [ ] Delete item and redirect to index
+- [ ] Add error boundary 404 page
+
+## Dependent data
+
+- [ ] Add nested relationships to schema
+- [ ] Add parent issue input to edit form
+- [ ] Add child issues to edit form
+- [ ] Add nested issue inputs to table view
+- [ ] Allow creating children from issue page
+- [ ] Filter issues by parent/child
+- [ ] Cascading deletes
+
+## Dashboarding
+
+- [ ] Add dashboard route
+- [ ] Fetch data (?)
+- [ ] Defer slow queries
+- [ ] Use suspense keys to unblock client navigations
+
+# Workshop 2
+
+## User management
+
+- [ ] Connect login route
+- [ ] Protect app routes from unauthenticated users
+- [ ] Attach user info to documents
+- [ ] Restrict user from editing others' documents
+
+## Audit logs
+
+- [ ] Add event log to schema
+- [ ] Update mutations to log events
+- [ ] Create audit route to view all events
+
+## Commenting
+
+- [ ] Add comment schema
+- [ ] Add comment form to issue
+
+## Notifications
+
+##
 
 <hr />
 

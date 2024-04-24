@@ -14,6 +14,36 @@ if (!filePath) {
 	process.exit(1)
 }
 
+// Extract the target directory name from the file's path
+const targetDirName = path.basename(path.dirname(filePath))
+let targetDirectories = []
+await findTargetDirectories(process.cwd(), targetDirName, targetDirectories)
+
+// Remove the original file's directory from the list of target directories
+const originalDirPath = path.resolve(path.dirname(filePath))
+const filteredDirectories = targetDirectories.filter(
+	dir => path.resolve(dir) !== originalDirPath,
+)
+
+if (filteredDirectories.length > 0) {
+	console.log('Target directories found:')
+	filteredDirectories.forEach(dir =>
+		console.log(dir.replace(process.cwd(), '')),
+	)
+	const answer = await ask(
+		'Do you want to replicate the file to all of these directories? (Y/N): ',
+	)
+	if (answer.toLowerCase() === 'y') {
+		await copyFileToDirectories(filePath, filteredDirectories)
+	} else {
+		console.log('Operation canceled.')
+	}
+} else {
+	console.log('No target directories found.')
+}
+
+rl.close()
+
 function ask(question) {
 	return new Promise(function (resolve) {
 		rl.question(question, ans => {
@@ -43,35 +73,3 @@ async function copyFileToDirectories(filePath, directories) {
 		console.log(`Copied to: ${destinationPath.replace(process.cwd(), '')}`)
 	}
 }
-
-;(async function main() {
-	// Extract the target directory name from the file's path
-	const targetDirName = path.basename(path.dirname(filePath))
-	let targetDirectories = []
-	await findTargetDirectories(process.cwd(), targetDirName, targetDirectories)
-
-	// Remove the original file's directory from the list of target directories
-	const originalDirPath = path.resolve(path.dirname(filePath))
-	const filteredDirectories = targetDirectories.filter(
-		dir => path.resolve(dir) !== originalDirPath,
-	)
-
-	if (filteredDirectories.length > 0) {
-		console.log('Target directories found:')
-		filteredDirectories.forEach(dir =>
-			console.log(dir.replace(process.cwd(), '')),
-		)
-		const answer = await ask(
-			'Do you want to replicate the file to all of these directories? (Y/N): ',
-		)
-		if (answer.toLowerCase() === 'y') {
-			await copyFileToDirectories(filePath, filteredDirectories)
-		} else {
-			console.log('Operation canceled.')
-		}
-	} else {
-		console.log('No target directories found.')
-	}
-
-	rl.close()
-})()
