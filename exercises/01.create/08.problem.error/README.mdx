@@ -1,12 +1,67 @@
-# Write to the database
+# Error handling
 
-Great work! You've successfully implemented a new item form that writes issues to the database.
+Users shouldn't be able to submit the same title twice.
 
-Kellie, your coworker, will implement the more advanced database logic involving the transaction for getting the highest issue number for you. That will guarantee no one can create a new issue between the time we count the issues and use it as the new number. In the worst case, that scenario could cause two issues with the same number, which would be rejected by the database .
+When you want to show custom error messages to the user, it's time to switch from raw forms to Conform. Conform is pretty easy to set up and solves a lot of problems.
 
-Outside of this transactional approach, there are a number of other solutions for this
+Instead of adding props to the form and input components ourselves, configure the `useForm() hook` and let Conform generate the props for you.
 
-- We could use an auto-incrementing primary key in the database and have a separate database for each project
-- We could forgo projects entirely and keep all the issues together
+Given a form with a custom `onSubmit` handler and an input
 
-If you're applying these lessons to a real-world project, you might make a different choice based on the specific needs of your application.
+```tsx
+function CreateForm() {
+	return (
+		<Form
+			method="POST"
+			onSubmit={event => {
+				event.preventDefault()
+
+				submit(event.currentTarget, {
+					navigate: false,
+					flushSync: true,
+				})
+
+				window.scrollTo(0, 0)
+			}}
+		>
+			// ADD DEFAULT VALUES TO THE USE FORM HOOK
+			<Field
+				labelProps={{ children: 'New item' }}
+				inputProps={{
+					type: 'text',
+					name: 'title',
+					required: true,
+				}}
+			/>
+		</Form>
+	)
+}
+```
+
+After migrating to Conform, will look like this
+
+```tsx
+function CreateForm() {
+	const [form, fields] = useForm({
+		onSubmit(event) {
+			event.preventDefault()
+
+			submit(event.currentTarget, {
+				navigate: false,
+				flushSync: true,
+			})
+
+			window.scrollTo(0, 0)
+		},
+	})
+
+	return (
+		<Form method="POST" {...getFormProps(form)}>
+			<Field
+				labelProps={{ children: 'New item' }}
+				inputProps={getInputProps(fields.title, { type: 'text' })}
+			/>
+		</Form>
+	)
+}
+```

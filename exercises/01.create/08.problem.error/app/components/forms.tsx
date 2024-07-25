@@ -1,6 +1,7 @@
 import { useInputControl } from '@conform-to/react'
 import React, { useId } from 'react'
 import { Checkbox, type CheckboxProps } from './ui/checkbox.tsx'
+import { Icon } from './ui/icon.tsx'
 import { Input } from './ui/input.tsx'
 import { Label } from './ui/label.tsx'
 import { Textarea } from './ui/textarea.tsx'
@@ -19,8 +20,8 @@ export function ErrorList({
 	return (
 		<ul id={id} className="flex flex-col gap-1">
 			{errorsToRender.map(e => (
-				<li key={e} className="text-[10px] text-foreground-destructive">
-					{e}
+				<li key={e} className="text-foreground-destructive text-sm">
+					<Icon name="info-circled" className="h-5 w-5 align-top" /> {e}
 				</li>
 			))}
 		</ul>
@@ -50,7 +51,7 @@ export function Field({
 				aria-describedby={errorId}
 				{...inputProps}
 			/>
-			<div className="min-h-[32px] px-4 pb-3 pt-1">
+			<div className="min-h-[32px] pb-3 pt-1">
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>
@@ -80,7 +81,7 @@ export function TextareaField({
 				aria-describedby={errorId}
 				{...textareaProps}
 			/>
-			<div className="min-h-[32px] px-4 pb-3 pt-1">
+			<div className="min-h-[32px] pb-3 pt-1">
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>
@@ -140,10 +141,10 @@ export function CheckboxField({
 				<label
 					htmlFor={id}
 					{...labelProps}
-					className="self-center text-body-xs text-muted-foreground"
+					className="text-body-xs text-muted-foreground self-center"
 				/>
 			</div>
-			<div className="px-4 pb-3 pt-1">
+			<div className="pb-3 pt-1">
 				{errorId ? <ErrorList id={errorId} errors={errors} /> : null}
 			</div>
 		</div>

@@ -27,6 +27,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	const project = 'EIT'
 	const number = await prisma.issue.count()
+	console.log({ number })
 	await prisma.issue.create({
 		data: {
 			project,
@@ -47,7 +48,7 @@ export async function action({ request }: ActionFunctionArgs) {
 export async function loader({ request }: LoaderFunctionArgs) {
 	const issues = await prisma.issue.findMany({
 		orderBy: {
-			createdAt: 'desc',
+			number: 'asc',
 		},
 		select: {
 			id: true,

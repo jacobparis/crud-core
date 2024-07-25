@@ -1,18 +1,19 @@
-import { parseWithZod } from '@conform-to/zod'
+import { getFormProps, getInputProps, useForm } from '@conform-to/react'
+import { getZodConstraint, parseWithZod } from '@conform-to/zod'
 import {
 	json,
 	type LoaderFunctionArgs,
 	type ActionFunctionArgs,
 } from '@remix-run/node'
-import { Form, useLoaderData, useSubmit } from '@remix-run/react'
+import { Form, useActionData, useLoaderData, useSubmit } from '@remix-run/react'
 import { z } from 'zod'
 import { Field } from '#app/components/forms.js'
 import { Button } from '#app/components/ui/button.js'
 import { prisma } from '#app/utils/db.server.js'
-import { redirectWithToast } from '#app/utils/toast.server.js'
+import { createToastHeaders } from '#app/utils/toast.server.js'
 
 const CreateIssueInlineSchema = z.object({
-	title: z.string().min(1),
+	title: z.string().min(3, 'Your title must be at least 3 characters'),
 })
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -38,10 +39,16 @@ export async function action({ request }: ActionFunctionArgs) {
 		},
 	})
 
-	return redirectWithToast('/issues', {
-		description: `Created issue ${project}-${number}`,
-		type: 'success',
-	})
+	return json(
+		{ result: submission.reply({ resetForm: true }) },
+		{
+			status: 201,
+			headers: await createToastHeaders({
+				description: `Created issue ${project}-${number}`,
+				type: 'success',
+			}),
+		},
+	)
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -64,8 +71,37 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Issues() {
+	const actionData = useActionData<typeof action>()
 	const { issues } = useLoaderData<typeof loader>()
 	const submit = useSubmit()
+
+	const [form, fields] = useForm({
+		id: 'create-issue-inline',
+		// Adds required, min, etc props to the fields based on the schema
+		constraint: getZodConstraint(CreateIssueInlineSchema),
+		// Tells conform about any errors we've had
+		lastResult: actionData?.result,
+		onValidate({ formData }) {
+			return parseWithZod(formData, { schema: CreateIssueInlineSchema })
+		},
+
+		onSubmit(event) {
+			event.preventDefault()
+			const form = event.currentTarget as HTMLFormElement
+
+			submit(form, {
+				navigate: false,
+				unstable_flushSync: true,
+			})
+
+			// scroll to bottom of page
+			window.scrollTo(0, document.body.scrollHeight)
+
+			// reset title input
+			const titleInput = form['title'] as unknown as HTMLInputElement
+			titleInput.value = ''
+		},
+	})
 
 	return (
 		<div className="mx-auto max-w-4xl p-4">
@@ -80,30 +116,11 @@ export default function Issues() {
 			</div>
 
 			<div>
-				<Form
-					method="POST"
-					onSubmit={event => {
-						event.preventDefault()
-						const form = event.currentTarget
-
-						submit(event.currentTarget, {
-							method: 'POST',
-							navigate: false,
-						})
-
-						// Typescript thinks form.title is the <form title=""> attribute
-						// but it's overridden by the input element with the name "title"
-						const titleElement = form.title as unknown as HTMLInputElement
-						titleElement.value = ''
-					}}
-				>
+				<Form method="POST" {...getFormProps(form)}>
 					<Field
 						labelProps={{ children: 'New issue' }}
-						inputProps={{
-							type: 'text',
-							name: 'title',
-							required: true,
-						}}
+						inputProps={getInputProps(fields.title, { type: 'text' })}
+						errors={fields.title.errors}
 					/>
 
 					<Button type="submit">Submit</Button>

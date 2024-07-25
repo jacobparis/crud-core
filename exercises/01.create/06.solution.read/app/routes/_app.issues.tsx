@@ -8,7 +8,7 @@ import { Form, useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
 import { Field } from '#app/components/forms.js'
 import { Button } from '#app/components/ui/button.js'
-import { prisma } from '#app/utils/db.server'
+import { prisma } from '#app/utils/db.server.js'
 import { redirectWithToast } from '#app/utils/toast.server.js'
 
 const CreateIssueInlineSchema = z.object({
