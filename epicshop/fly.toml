@@ -1,4 +1,4 @@
-app = "epicweb-dev-crud-bulk-operations"
+app = "epicweb-dev-mocking-techniques"
 primary_region = "sjc"
 kill_signal = "SIGINT"
 kill_timeout = 5

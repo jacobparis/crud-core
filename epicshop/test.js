@@ -7,7 +7,7 @@ import {
 	getApps,
 	isExampleApp,
 	isSolutionApp,
-} from '@kentcdodds/workshop-utils/apps.server'
+} from '@epic-web/workshop-utils/apps.server'
 
 const styles = {
 	// got these from playing around with what I found from:
@@ -31,7 +31,7 @@ const relativeToWorkshopRoot = dir =>
 	dir.replace(`${workshopRoot}${path.sep}`, '')
 
 // bundleMDX - throw when process.NODE_ENV is not a string
-// @kentcdodds/workshop-app/build/utils/compile-mdx.server
+// @epic-web/workshop-utils/compile-mdx.server
 process.env.NODE_ENV = 'development'
 
 const apps = await getApps()
@@ -53,7 +53,6 @@ for (const app of [...solutionApps, ...exampleApps]) {
 		shell: true,
 		windowsHide: false,
 		env: {
-			OPEN_PLAYWRIGHT_REPORT: 'never',
 			...process.env,
 			PORT: app.dev.portNumber,
 		},
