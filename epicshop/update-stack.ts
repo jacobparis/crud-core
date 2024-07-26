@@ -25,7 +25,7 @@ const defaultIgnoredPaths = [
   "tests/e2e/search.test.ts",
   ".github/workflows/version.yml",
 ]
-const ignoredPaths = []
+const ignoredPaths: Array<string> = []
 // Consolidated package.json checks
 const packageJsonPath = path.join(targetDir, "package.json")
 if (fs.existsSync(packageJsonPath)) {
@@ -64,10 +64,10 @@ const repoPath = path.join(
   "epic-stack"
 )
 
-function cleanPath(path) {
+function cleanPath(path: string) {
   return path.replace(process.cwd(), "")
 }
-async function gitCommand(command, repoPath) {
+async function gitCommand(command: string, repoPath: string) {
   return execSync(command, { encoding: "utf8", cwd: repoPath }).trim()
 }
 
@@ -90,7 +90,11 @@ async function cloneOrUpdateRepo() {
   }
 }
 
-async function getCommitsBetween(repoPath, startHash, endHash = "HEAD") {
+async function getCommitsBetween(
+  repoPath: string,
+  startHash: string,
+  endHash: string = "HEAD"
+) {
   const output = await gitCommand(
     `git log --reverse --pretty=format:"%H|%s" ${startHash}..${endHash}`,
     repoPath
@@ -101,7 +105,7 @@ async function getCommitsBetween(repoPath, startHash, endHash = "HEAD") {
   })
 }
 
-async function getChangedFiles(repoPath, sha) {
+async function getChangedFiles(repoPath: string, sha: string) {
   const output = await gitCommand(
     `git diff-tree --no-commit-id --name-status -r ${sha}`,
     repoPath
@@ -112,16 +116,11 @@ async function getChangedFiles(repoPath, sha) {
   })
 }
 
-async function isNewFile(repoPath, file, currentHash) {
-  try {
-    await gitCommand(`git ls-tree -r ${currentHash} -- ${file}`, repoPath)
-    return false
-  } catch (error) {
-    return true
-  }
-}
-
-async function shouldApply(repoPath, commit, newFiles) {
+async function shouldApply(
+  repoPath: string,
+  commit: { sha: string },
+  newFiles: Array<{ commit: string; file: string }>
+) {
   const changedFiles = await getChangedFiles(repoPath, commit.sha)
   for (const { status, file } of changedFiles) {
     if (status === "A") {
@@ -137,7 +136,7 @@ async function shouldApply(repoPath, commit, newFiles) {
   return false // Only modifies files we don't have
 }
 
-async function getFileContent(repoPath, sha, file) {
+async function getFileContent(repoPath: string, sha: string, file: string) {
   try {
     // Escape special characters in the file path
     const escapedFile = file.replace(/\$/g, "\\$")
@@ -154,27 +153,21 @@ async function getFileContent(repoPath, sha, file) {
   }
 }
 
-function normalizeLineEndings(content) {
-  return content.replace(/\r\n/g, "\n").replace(/\r/g, "\n")
-}
-
-function contentOnlyDiffersInFinalNewline(existingContent, newContent) {
-  const normalizedExisting = normalizeLineEndings(existingContent)
-  const normalizedNew = normalizeLineEndings(newContent)
-  return normalizedExisting.trimEnd() === normalizedNew.trimEnd()
-}
-
-function ensureTrailingNewline(content) {
+function ensureTrailingNewline(content: string) {
   return content.endsWith("\n") ? content : content + "\n"
 }
 
-function shouldIgnorePath(file) {
+function shouldIgnorePath(file: string) {
   return [...defaultIgnoredPaths, ...ignoredPaths].some(
     (ignoredPath) => file === ignoredPath || file.startsWith(`${ignoredPath}/`)
   )
 }
 
-async function applyCommit(repoPath, commit, targetDir) {
+async function applyCommit(
+  repoPath: string,
+  commit: { sha: string; message: string },
+  targetDir: string
+) {
   console.log(
     chalk.green(`#${commit.sha.substring(0, 7)}: `) + `${commit.message}`
   )
@@ -193,27 +186,23 @@ async function applyCommit(repoPath, commit, targetDir) {
 
     const targetPath = path.join(targetDir, file)
 
-    let content
+    const content = await getFileContent(repoPath, commit.sha, file)
     switch (status) {
       case "A":
-        content = await getFileContent(repoPath, commit.sha, file)
         if (content !== null) {
-          content = ensureTrailingNewline(content)
           if (!dryRun) {
             const dirPath = path.dirname(targetPath)
             fs.mkdirSync(dirPath, { recursive: true })
-            fs.writeFileSync(targetPath, content)
+            fs.writeFileSync(targetPath, ensureTrailingNewline(content))
+            console.log(dryRun ? "(dry run)" : "", chalk.green("A"), `${file}`)
           }
-          console.log(dryRun ? "(dry run)" : "", chalk.green("A"), `${file}`)
         }
         break
       case "M":
         if (fs.existsSync(targetPath)) {
-          content = await getFileContent(repoPath, commit.sha, file)
           if (content !== null) {
-            content = ensureTrailingNewline(content)
             if (!dryRun) {
-              fs.writeFileSync(targetPath, content)
+              fs.writeFileSync(targetPath, ensureTrailingNewline(content))
             }
             console.log(dryRun ? "(dry run)" : "", chalk.cyan("M"), `${file}`)
           }
@@ -247,13 +236,11 @@ async function applyCommit(repoPath, commit, targetDir) {
             `${oldFile} -> ${newFile}`
           )
         } else {
-          content = await getFileContent(repoPath, commit.sha, newFile)
           if (content !== null) {
-            content = ensureTrailingNewline(content)
             if (!dryRun) {
               const dirPath = path.dirname(newPath)
               fs.mkdirSync(dirPath, { recursive: true })
-              fs.writeFileSync(newPath, content)
+              fs.writeFileSync(newPath, ensureTrailingNewline(content))
             }
             console.log(
               dryRun ? "(dry run)" : "",
@@ -276,11 +263,13 @@ async function main() {
   await cloneOrUpdateRepo()
   console.timeEnd("Pulled latest changes")
 
-  const messages = []
-  const newFiles = []
-  const instructions = []
+  const newFiles: Array<{ commit: string; file: string }> = []
+  const instructions: Array<{
+    commit: { sha: string; message: string }
+    skip: boolean
+  }> = []
   console.time("Fetched commits")
-  const commits = await getCommitsBetween(repoPath, initialHash)
+  const commits = await getCommitsBetween(repoPath, initialHash!)
   console.log(`Found ${commits.length} commits`)
   console.timeEnd("Fetched commits")
 
