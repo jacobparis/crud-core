@@ -43,8 +43,6 @@ export const links: LinksFunction = () => {
 	return [
 		// Preload svg sprite as a resource to avoid render blocking
 		{ rel: 'preload', href: iconsHref, as: 'image' },
-		// Preload CSS as a resource to avoid render blocking
-		{ rel: 'preload', href: tailwindStyleSheetUrl, as: 'style' },
 		{ rel: 'mask-icon', href: '/favicons/mask-icon.svg' },
 		{
 			rel: 'alternate icon',
@@ -243,7 +241,7 @@ export function useTheme() {
  */
 export function useOptimisticThemeMode() {
 	const fetchers = useFetchers()
-	const themeFetcher = fetchers.find(f => f.formAction === '/')
+	const themeFetcher = fetchers.find((f) => f.formAction === '/')
 
 	if (themeFetcher && themeFetcher.formData) {
 		const submission = parseWithZod(themeFetcher.formData, {
