@@ -32,18 +32,20 @@ const ignoredPaths: Array<string> = []
 
 // Consolidated package.json checks
 const packageJsonPath = path.join(targetDir, 'package.json')
-if (fs.existsSync(packageJsonPath)) {
-	const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
-	const epicStackConfig = packageJson['epic-stack'] || {}
+if (!fs.existsSync(packageJsonPath)) {
+	throw new Error('package.json not found')
+}
 
-	// Read ignoredPaths from package.json#epic-stack
-	const additionalIgnoredPaths = epicStackConfig.ignoredPaths || []
-	ignoredPaths.push(...additionalIgnoredPaths)
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
+const epicStackConfig = packageJson['epic-stack'] || {}
 
-	// Read initialHash if not provided
-	if (!initialHash) {
-		initialHash = epicStackConfig.head
-	}
+// Read ignoredPaths from package.json#epic-stack
+const additionalIgnoredPaths = epicStackConfig.ignoredPaths || []
+ignoredPaths.push(...additionalIgnoredPaths)
+
+// Read initialHash if not provided
+if (!initialHash) {
+	initialHash = epicStackConfig.head
 }
 
 // Add custom ignore paths from command line arguments
@@ -289,34 +291,46 @@ index ${hash}..0000000
 	}
 	// Pathc package.json with the new commit hash
 	const packageJsonPath = path.join(repoPath, 'package.json')
-	if (fs.existsSync(packageJsonPath)) {
-		const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
-		if (
-			!packageJson['epic-stack'] ||
-			typeof packageJson['epic-stack'] !== 'object'
-		) {
-			packageJson['epic-stack'] = {}
-		}
-		packageJson['epic-stack'].head = commit.sha
+	if (!fs.existsSync(`${packageJsonPath}.tmp`)) {
+		fs.copyFileSync(packageJsonPath, `${packageJsonPath}.tmp`)
+	}
 
-		if (!dryRun) {
+	const newPackageJson = JSON.parse(
+		fs.readFileSync(`${packageJsonPath}.tmp`, 'utf-8'),
+	)
+	if (
+		!newPackageJson['epic-stack'] ||
+		typeof newPackageJson['epic-stack'] !== 'object'
+	) {
+		newPackageJson['epic-stack'] = {}
+	}
+	newPackageJson['epic-stack'].head = commit.sha
+
+	if (!dryRun) {
+		// copy package.json to package.json.tmp
+		fs.writeFileSync(
+			`${repoPath}/package.json.tmp.tmp`,
+			JSON.stringify(newPackageJson, null, 2) + '\n',
+		)
+		let diff = await gitCommand(
+			`git diff --no-index package.json.tmp package.json.tmp.tmp | cat`,
+			repoPath,
+		)
+		fs.unlinkSync(`${repoPath}/package.json.tmp.tmp`)
+		fs.writeFileSync(
+			`${repoPath}/package.json.tmp`,
+			JSON.stringify(newPackageJson, null, 2) + '\n',
+		)
+		if (diff) {
+			const patchPath = path.join(
+				targetDir,
+				'patches',
+				`${(context.patchNumber++).toString().padStart(4, '0')}.${hash}.patch`,
+			)
 			fs.writeFileSync(
-				`${repoPath}/package.json.tmp`,
-				JSON.stringify(packageJson, null, 2) + '\n',
+				patchPath,
+				correctPatch(diff, JSON.stringify(newPackageJson, null, 2)),
 			)
-			let diff = await gitCommand(
-				`git diff --no-index package.json package.json.tmp | cat`,
-				repoPath,
-			)
-			fs.unlinkSync(`${repoPath}/package.json.tmp`)
-			if (diff) {
-				const patchPath = path.join(
-					targetDir,
-					'patches',
-					`${(context.patchNumber++).toString().padStart(4, '0')}.${hash}.patch`,
-				)
-				fs.writeFileSync(patchPath, diff)
-			}
 		}
 	}
 }

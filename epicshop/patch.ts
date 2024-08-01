@@ -72,7 +72,6 @@ class Hunk {
 		let foundActionableLine = false
 		while (hunkInd < this.lines.length && fileInd <= maxLineNumber) {
 			const line = this.lines[hunkInd]
-			console.log('line', hunkInd, line.content, linesDict[fileInd])
 			if (line.type === 'add') {
 				foundActionableLine = true
 				hunkInd++
@@ -131,12 +130,10 @@ class Hunk {
 					// return false
 					hunkInd++
 				} else if (missingLineCountRatio > falseLineCountRatio) {
-					console.log('missing stuff, adding retained line')
 					// this.addRetainedLine(linesDict[fileInd], hunkInd)
 					hunkInd++
 					// fileInd++
 				} else {
-					console.log('fallthrough', line.content, linesDict[fileInd])
 					// this tries to remove a line that can't be found
 					// if it's a modification, we also need to remove its replacement
 					if (line.type === 'remove') {
@@ -152,7 +149,6 @@ class Hunk {
 						}
 
 						if (matchingAddLineIndex) {
-							console.log('removing matching line')
 							const lineToRemove = this.lines[matchingAddLineIndex]
 							this.popLine(line, hunkInd--)
 							this.popLine(lineToRemove, matchingAddLineIndex - 1)
@@ -364,18 +360,17 @@ function parseDiff(diffText: string): Diff {
 	for (const line of lines) {
 		preIndex++
 		if (line.startsWith('--- a/')) {
-			filenamePre = line.slice(6)
+			filenamePre = line.slice(6).replace('.tmp', '')
 		} else if (line.startsWith('+++ b/')) {
-			filenamePost = line.slice(6)
+			filenamePost = line.slice(6).replace('.tmp', '')
 			break
 		}
 	}
 
-	// Remove the first preIndex lines
-	lines.splice(0, preIndex)
+	// // Remove the first preIndex lines
+	// lines.splice(0, preIndex)
 
 	if (!filenamePre || !filenamePost) {
-		console.log(diffText)
 		throw new Error('Could not find file names in diff')
 	}
 
@@ -524,20 +519,16 @@ export function correctPatch(
 	})
 
 	// BUG SOLVED: must match lines when the first lines of the hunk aren't present in the file
-	console.log('Working with ', diff.hunks.length, ' hunks')
-	console.log(diff.hunks.map((hunk) => hunk.lines))
 	// Adjust hunk line numbers if necessary
 	for (const hunk of diff.hunks) {
 		let foundMatch = false
 		let candidates = []
-		console.log('Anchor line', hunk.lines[0].content)
 		// TODO: this probably wont'work if the first line of the diff can't match
 		for (let lineNumber = 0; lineNumber < hunk.lines.length; lineNumber++) {
 			for (let index = 0; index <= Object.keys(linesDict).length * 2; index++) {
 				const i = index % 2 === 0 ? index / 2 : -(Math.floor(index / 2) + 1)
 				const adjustedStartLine = hunk.startLinePreEdit + i
 				if (adjustedStartLine < 0) continue
-				console.log(adjustedStartLine, linesDict[adjustedStartLine])
 				if (!linesDict[adjustedStartLine]) {
 					continue
 				}
