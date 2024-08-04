@@ -14,13 +14,24 @@ export default defineConfig({
 			external: [/node:.*/, 'stream', 'crypto', 'fsevents'],
 		},
 
+		assetsInlineLimit: (source: string) => {
+			if (source.endsWith('sprite.svg')) {
+				return false
+			}
+		},
+
 		sourcemap: true,
+	},
+	server: {
+		watch: {
+			ignored: ['**/playwright-report/**'],
+		},
 	},
 	plugins: [
 		remix({
 			ignoredRouteFiles: ['**/*'],
 			serverModuleFormat: 'esm',
-			routes: async defineRoutes => {
+			routes: async (defineRoutes) => {
 				return flatRoutes('routes', defineRoutes, {
 					ignoredRouteFiles: [
 						'.*',

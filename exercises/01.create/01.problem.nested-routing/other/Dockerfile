@@ -32,6 +32,11 @@ FROM base as build
 ARG COMMIT_SHA
 ENV COMMIT_SHA=$COMMIT_SHA
 
+# Use the following environment variables to configure Sentry
+# ENV SENTRY_ORG=
+# ENV SENTRY_PROJECT=
+
+
 WORKDIR /myapp
 
 COPY --from=deps /myapp/node_modules /myapp/node_modules
@@ -43,8 +48,8 @@ ADD . .
 
 # Mount the secret and set it as an environment variable and run the build
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN \
-    export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && \
-    npm run build
+  export SENTRY_AUTH_TOKEN=$(cat /run/secrets/SENTRY_AUTH_TOKEN) && \
+  npm run build
 
 # Finally, build the production image with minimal footprint
 FROM base
@@ -66,6 +71,10 @@ ENV PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK = "1"
 RUN echo "#!/bin/sh\nset -x\nsqlite3 \$DATABASE_URL" > /usr/local/bin/database-cli && chmod +x /usr/local/bin/database-cli
 
 WORKDIR /myapp
+
+# Generate random value and save it to .env file which will be loaded by dotenv
+RUN INTERNAL_COMMAND_TOKEN=$(openssl rand -hex 32) && \
+  echo "INTERNAL_COMMAND_TOKEN=$INTERNAL_COMMAND_TOKEN" > .env
 
 COPY --from=production-deps /myapp/node_modules /myapp/node_modules
 COPY --from=build /myapp/node_modules/.prisma /myapp/node_modules/.prisma

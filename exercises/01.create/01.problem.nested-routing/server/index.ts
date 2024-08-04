@@ -1,7 +1,6 @@
 import crypto from 'crypto'
-import { createRequestHandler as _createRequestHandler } from '@remix-run/express'
-import { type ServerBuild, installGlobals } from '@remix-run/node'
-import * as Sentry from '@sentry/remix'
+import { createRequestHandler } from '@remix-run/express'
+import { type ServerBuild } from '@remix-run/node'
 import { ip as ipAddress } from 'address'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
@@ -12,23 +11,19 @@ import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
 
-installGlobals()
-
 const MODE = process.env.NODE_ENV ?? 'development'
 
-const createRequestHandler =
-	MODE === 'production'
-		? Sentry.wrapExpressCreateRequestHandler(_createRequestHandler)
-		: _createRequestHandler
+const IS_PROD = MODE === 'production'
+const IS_DEV = MODE === 'development'
+const ALLOW_INDEXING = process.env.ALLOW_INDEXING !== 'false'
 
-const viteDevServer =
-	MODE === 'production'
-		? undefined
-		: await import('vite').then(vite =>
-				vite.createServer({
-					server: { middlewareMode: true },
-				}),
-		  )
+const viteDevServer = IS_PROD
+	? undefined
+	: await import('vite').then((vite) =>
+			vite.createServer({
+				server: { middlewareMode: true },
+			}),
+		)
 
 const app = express()
 
@@ -67,9 +62,6 @@ app.use(compression())
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
 app.disable('x-powered-by')
 
-app.use(Sentry.Handlers.requestHandler())
-app.use(Sentry.Handlers.tracingHandler())
-
 if (viteDevServer) {
 	app.use(viteDevServer.middlewares)
 } else {
@@ -84,13 +76,13 @@ if (viteDevServer) {
 	app.use(express.static('build/client', { maxAge: '1h' }))
 }
 
-app.get(['/img/*', '/favicons/*'], (req, res) => {
+app.get(['/img/*', '/favicons/*'], (_req, res) => {
 	// if we made it past the express.static for these, then we're missing something.
 	// So we'll just send a 404 and won't bother calling other middleware.
 	return res.status(404).send('Not found')
 })
 
-morgan.token('url', req => decodeURIComponent(req.url ?? ''))
+morgan.token('url', (req) => decodeURIComponent(req.url ?? ''))
 app.use(
 	morgan('tiny', {
 		skip: (req, res) =>
@@ -108,7 +100,6 @@ app.use((_, res, next) => {
 
 app.use(
 	helmet({
-		xPoweredBy: false,
 		referrerPolicy: { policy: 'same-origin' },
 		crossOriginEmbedderPolicy: true,
 		xFrameOptions: false,
@@ -154,6 +145,13 @@ const rateLimitDefault = {
 	// Fly.io prevents spoofing of X-Forwarded-For
 	// so no need to validate the trustProxy config
 	validate: { trustProxy: false },
+	// Malicious users can spoof their IP address which means we should not deault
+	// to trusting req.ip when hosted on Fly.io. However, users cannot spoof Fly-Client-Ip.
+	// When sitting behind a CDN such as cloudflare, replace fly-client-ip with the CDN
+	// specific header such as cf-connecting-ip
+	keyGenerator: (req: express.Request) => {
+		return req.get('fly-client-ip') ?? `${req.ip}`
+	},
 }
 
 const strongestRateLimit = rateLimit({
@@ -207,6 +205,13 @@ async function getBuild() {
 	return build as unknown as ServerBuild
 }
 
+if (!ALLOW_INDEXING) {
+	app.use((_, res, next) => {
+		res.set('X-Robots-Tag', 'noindex, nofollow')
+		next()
+	})
+}
+
 app.all(
 	'*',
 	createRequestHandler({
@@ -224,6 +229,11 @@ const desiredPort = Number(process.env.PORT || 3000)
 const portToUse = await getPort({
 	port: portNumbers(desiredPort, desiredPort + 100),
 })
+const portAvailable = desiredPort === portToUse
+if (!portAvailable && !IS_DEV) {
+	console.log(`⚠️ Port ${desiredPort} is not available.`)
+	process.exit(1)
+}
 
 const server = app.listen(portToUse, () => {
 	const addy = server.address()
