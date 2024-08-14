@@ -21,6 +21,7 @@ import { useToast } from './components/toaster.tsx'
 import { href as iconsHref } from './components/ui/icon.tsx'
 import { EpicToaster } from './components/ui/sonner.tsx'
 import { KCDShop } from './kcdshop.tsx'
+import { useTheme } from './routes/resources+/theme-switch.tsx'
 import tailwindStyleSheetUrl from './styles/tailwind.css?url'
 import { getUserId, logout } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
@@ -30,7 +31,6 @@ import { honeypot } from './utils/honeypot.server.ts'
 import { combineHeaders, getDomainUrl } from './utils/misc.tsx'
 import { useNonce } from './utils/nonce-provider.ts'
 
-import { useTheme } from './routes/resources+/theme-switch.tsx'
 import { type Theme, getTheme } from './utils/theme.server.ts'
 import { makeTimings, time } from './utils/timing.server.ts'
 import { getToast } from './utils/toast.server.ts'
@@ -184,7 +184,12 @@ function App() {
 	useToast(data.toast)
 
 	return (
-		<Document nonce={nonce} theme={theme} env={data.ENV} allowIndexing={allowIndexing}>
+		<Document
+			nonce={nonce}
+			theme={theme}
+			env={data.ENV}
+			allowIndexing={allowIndexing}
+		>
 			<Outlet />
 			<EpicToaster closeButton position="top-center" theme={theme} />
 			<EpicProgress />

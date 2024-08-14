@@ -6,7 +6,7 @@ import {
 	type HandleDocumentRequestFunction,
 } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
-import * as Sentry from '@sentry/remix'
+import chalk from 'chalk'
 import { isbot } from 'isbot'
 import { renderToPipeableStream } from 'react-dom/server'
 import { getEnv, init } from './utils/env.server.ts'
@@ -18,10 +18,6 @@ const ABORT_DELAY = 5000
 
 init()
 global.ENV = getEnv()
-
-if (ENV.MODE === 'production' && ENV.SENTRY_DSN) {
-	import('./utils/monitoring.server.ts').then(({ init }) => init())
-}
 
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
 
@@ -97,9 +93,15 @@ export function handleError(
 	error: unknown,
 	{ request }: LoaderFunctionArgs | ActionFunctionArgs,
 ): void {
+	// Skip capturing if the request is aborted as Remix docs suggest
+	// Ref: https://remix.run/docs/en/main/file-conventions/entry.server#handleerror
+	if (request.signal.aborted) {
+		return
+	}
+
 	if (error instanceof Error) {
-		Sentry.captureRemixServerException(error, 'remix.server', request)
+		console.error(chalk.red(error.stack))
 	} else {
-		Sentry.captureException(error)
+		console.error(chalk.red(error))
 	}
 }
