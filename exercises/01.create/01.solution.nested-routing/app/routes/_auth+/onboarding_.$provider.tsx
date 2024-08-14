@@ -130,7 +130,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				})
 				return
 			}
-		}).transform(async data => {
+		}).transform(async (data) => {
 			const session = await signupWithConnection({
 				...data,
 				email,
@@ -271,7 +271,7 @@ export default function SignupRoute() {
 					<div className="flex items-center justify-between gap-6">
 						<StatusButton
 							className="w-full"
-							status={isPending ? 'pending' : form.status ?? 'idle'}
+							status={isPending ? 'pending' : (form.status ?? 'idle')}
 							type="submit"
 							disabled={isPending}
 						>

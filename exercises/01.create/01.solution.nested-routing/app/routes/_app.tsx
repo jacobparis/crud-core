@@ -9,10 +9,10 @@ export default function App() {
 
 	return (
 		<div>
-			<div className="shadow-smooth flex border-b border-slate-200">
+			<div className="flex border-b border-slate-200 shadow-smooth">
 				<div className="flex min-w-[20ch] bg-white p-1">
 					<Button
-						onClick={() => setIsOpened(opened => !opened)}
+						onClick={() => setIsOpened((opened) => !opened)}
 						variant="ghost"
 						size="icon"
 						className="h-8 w-8"
@@ -37,7 +37,7 @@ function Sidebar({ className }: { className?: string }) {
 	return (
 		<div
 			className={clsx([
-				`shadow-smooth min-h-screen min-w-[20ch] flex-col gap-y-1 border-r border-slate-200  bg-white p-2`,
+				`min-h-screen min-w-[20ch] flex-col gap-y-1 border-r border-slate-200 bg-white p-2 shadow-smooth`,
 				className,
 			])}
 		>
@@ -56,7 +56,7 @@ function NavItem({ to, children }: { to: string; children: React.ReactNode }) {
 					'block rounded-sm px-4 py-1 text-sm font-medium',
 					isActive
 						? 'bg-muted text-neutral-900'
-						: 'hover:bg-muted text-neutral-600 hover:text-neutral-900',
+						: 'text-neutral-600 hover:bg-muted hover:text-neutral-900',
 				)
 			}
 		>

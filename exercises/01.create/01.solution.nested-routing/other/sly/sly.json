@@ -1,11 +1,16 @@
 {
-  "$schema": "https://sly-cli.fly.dev/registry/config.json",
-  "libraries": [
-    {
-      "name": "@radix-ui/icons",
-      "directory": "./other/svg-icons",
-      "postinstall": ["npm", "run", "build:icons"],
-      "transformers": []
-    }
-  ]
+	"$schema": "https://sly-cli.fly.dev/registry/config.json",
+	"template": {
+		"repo": "https://github.com/epicweb-dev/epic-stack",
+		"head": "05d92de7e0ebd580edbf4bdd6b43447b32ece5e7",
+		"ignore": ["docs", "LICENSE.md"]
+	},
+	"libraries": [
+		{
+			"name": "@radix-ui/icons",
+			"directory": "./other/svg-icons",
+			"postinstall": ["npm", "run", "build:icons"],
+			"transformers": []
+		}
+	]
 }

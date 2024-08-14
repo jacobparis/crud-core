@@ -24,11 +24,11 @@ const createRequestHandler =
 const viteDevServer =
 	MODE === 'production'
 		? undefined
-		: await import('vite').then(vite =>
+		: await import('vite').then((vite) =>
 				vite.createServer({
 					server: { middlewareMode: true },
 				}),
-		  )
+			)
 
 const app = express()
 
@@ -90,7 +90,7 @@ app.get(['/img/*', '/favicons/*'], (req, res) => {
 	return res.status(404).send('Not found')
 })
 
-morgan.token('url', req => decodeURIComponent(req.url ?? ''))
+morgan.token('url', (req) => decodeURIComponent(req.url ?? ''))
 app.use(
 	morgan('tiny', {
 		skip: (req, res) =>
@@ -181,7 +181,7 @@ app.use((req, res, next) => {
 		'/resources/verify',
 	]
 	if (req.method !== 'GET' && req.method !== 'HEAD') {
-		if (strongPaths.some(p => req.path.includes(p))) {
+		if (strongPaths.some((p) => req.path.includes(p))) {
 			return strongestRateLimit(req, res, next)
 		}
 		return strongRateLimit(req, res, next)
@@ -200,8 +200,8 @@ async function getBuild() {
 	const build = viteDevServer
 		? viteDevServer.ssrLoadModule('virtual:remix/server-build')
 		: // @ts-ignore this should exist before running the server
-		  // but it may not exist just yet.
-		  await import('#build/server/index.js')
+			// but it may not exist just yet.
+			await import('#build/server/index.js')
 	// not sure how to make this happy 🤷‍♂️
 	return build as unknown as ServerBuild
 }
@@ -230,8 +230,8 @@ const server = app.listen(portToUse, () => {
 		desiredPort === portToUse
 			? desiredPort
 			: addy && typeof addy === 'object'
-			? addy.port
-			: 0
+				? addy.port
+				: 0
 
 	if (portUsed !== desiredPort) {
 		console.warn(
@@ -262,6 +262,6 @@ ${chalk.bold('Press Ctrl+C to stop')}
 
 closeWithGrace(async () => {
 	await new Promise((resolve, reject) => {
-		server.close(e => (e ? reject(e) : resolve('ok')))
+		server.close((e) => (e ? reject(e) : resolve('ok')))
 	})
 })

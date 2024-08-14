@@ -243,7 +243,7 @@ export function useTheme() {
  */
 export function useOptimisticThemeMode() {
 	const fetchers = useFetchers()
-	const themeFetcher = fetchers.find(f => f.formAction === '/')
+	const themeFetcher = fetchers.find((f) => f.formAction === '/')
 
 	if (themeFetcher && themeFetcher.formData) {
 		const submission = parseWithZod(themeFetcher.formData, {
