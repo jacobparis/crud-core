@@ -10,7 +10,13 @@ export default defineConfig({
 		rollupOptions: {
 			external: [/node:.*/, 'stream', 'crypto', 'fsevents'],
 		},
+		assetsInlineLimit: (source: string) => {
+			if (source.endsWith('sprite.svg')) {
+				return false
+			}
+		},
 	},
+
 	plugins: [
 		remix({
 			ignoredRouteFiles: ['**/*'],

@@ -1,9 +1,8 @@
 {
 	"$schema": "https://sly-cli.fly.dev/registry/config.json",
 	"template": {
-		"repo": "https://github.com/epicweb-dev/epic-stack",
-		"head": "05d92de7e0ebd580edbf4bdd6b43447b32ece5e7",
-		"ignore": ["docs", "LICENSE.md"]
+		"repo": "https://github.com/jacobparis/epic-crud-template",
+		"head": "6ba1ad5c0f6aba6f191cbfabfef6011b6e185a94"
 	},
 	"libraries": [
 		{

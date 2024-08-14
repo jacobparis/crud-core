@@ -7,9 +7,7 @@
 		"css": "app/styles/tailwind.css",
 		"baseColor": "slate",
 		"cssVariables": true
-	},
 	"aliases": {
 		"components": "#app/components",
 		"utils": "#app/utils/misc.tsx"
-	}
 }
