@@ -1,5 +1,9 @@
 {
   "$schema": "https://sly-cli.fly.dev/registry/config.json",
+  "template": {
+    "repo": "https://github.com/jacobparis/epic-crud-template",
+    "head": "6ba1ad5c0f6aba6f191cbfabfef6011b6e185a94"
+  },
   "libraries": [
     {
       "name": "@radix-ui/icons",
