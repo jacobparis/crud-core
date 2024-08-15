@@ -29,6 +29,11 @@ RUN npm prune --omit=dev
 # Build the app
 FROM base as build
 
+# Use the following environment variables to configure Sentry
+# ENV SENTRY_ORG=
+# ENV SENTRY_PROJECT=
+
+
 WORKDIR /myapp
 
 COPY --from=deps /myapp/node_modules /myapp/node_modules
@@ -59,6 +64,10 @@ ENV PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK = "1"
 RUN echo "#!/bin/sh\nset -x\nsqlite3 \$DATABASE_URL" > /usr/local/bin/database-cli && chmod +x /usr/local/bin/database-cli
 
 WORKDIR /myapp
+
+# Generate random value and save it to .env file which will be loaded by dotenv
+RUN INTERNAL_COMMAND_TOKEN=$(openssl rand -hex 32) && \
+  echo "INTERNAL_COMMAND_TOKEN=$INTERNAL_COMMAND_TOKEN" > .env
 
 COPY --from=production-deps /myapp/node_modules /myapp/node_modules
 COPY --from=build /myapp/node_modules/.prisma /myapp/node_modules/.prisma

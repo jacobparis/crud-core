@@ -30,6 +30,7 @@ import {
 	signupWithConnection,
 	requireAnonymous,
 } from '#app/utils/auth.server.ts'
+import { connectionSessionStorage } from '#app/utils/connections.server'
 import { ProviderNameSchema } from '#app/utils/connections.tsx'
 import { prisma } from '#app/utils/db.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
@@ -83,7 +84,7 @@ async function requireData({
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	const { email } = await requireData({ request, params })
-	const authSession = await authSessionStorage.getSession(
+	const connectionSession = await connectionSessionStorage.getSession(
 		request.headers.get('cookie'),
 	)
 	const verifySession = await verifySessionStorage.getSession(
@@ -91,17 +92,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	)
 	const prefilledProfile = verifySession.get(prefilledProfileKey)
 
-	const formError = authSession.get(authenticator.sessionErrorKey)
-
+	const formError = connectionSession.get(authenticator.sessionErrorKey)
+	const hasError = typeof formError === 'string'
 	return json({
 		email,
 		status: 'idle',
 		submission: {
-			status: 'error',
+			status: hasError ? 'error' : undefined,
 			initialValue: prefilledProfile ?? {},
-			error: {
-				'': typeof formError === 'string' ? [formError] : [],
-			},
+			error: { '': hasError ? [formError] : [] },
 		} as SubmissionResult,
 	})
 }
@@ -130,7 +129,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 				})
 				return
 			}
-		}).transform(async data => {
+		}).transform(async (data) => {
 			const session = await signupWithConnection({
 				...data,
 				email,
@@ -178,7 +177,7 @@ export const meta: MetaFunction = () => {
 	return [{ title: 'Setup Epic Notes Account' }]
 }
 
-export default function SignupRoute() {
+export default function OnboardingProviderRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 	const isPending = useIsPending()
@@ -271,7 +270,7 @@ export default function SignupRoute() {
 					<div className="flex items-center justify-between gap-6">
 						<StatusButton
 							className="w-full"
-							status={isPending ? 'pending' : form.status ?? 'idle'}
+							status={isPending ? 'pending' : (form.status ?? 'idle')}
 							type="submit"
 							disabled={isPending}
 						>
