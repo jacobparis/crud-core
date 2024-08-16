@@ -2,9 +2,9 @@ import { type SVGProps } from 'react'
 import { cn } from '#app/utils/misc.tsx'
 import { type IconName } from '@/icon-name'
 import href from './icons/sprite.svg'
+import { IconName } from '#types/icon-name.js'
 
-export { href }
-export { IconName }
+export { href, type IconName }
 
 const sizeClassName = {
 	font: 'w-[1em] h-[1em]',
@@ -49,7 +49,13 @@ export function Icon({
 			<span
 				className={`inline-flex items-center ${childrenSizeClassName[size]}`}
 			>
-				<Icon name={name} size={size} className={className} {...props} />
+				<Icon
+					name={name}
+					size={size}
+					className={className}
+					title={title}
+					{...props}
+				/>
 				{children}
 			</span>
 		)

@@ -111,6 +111,6 @@ export function handleError(
 		)
 	} else {
 		console.error(chalk.red(error))
-		Sentry.captureException(error)
+		console.error(chalk.red(error))
 	}
 }

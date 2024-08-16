@@ -20,7 +20,9 @@ const GitHubUserParseResult = z
 		}),
 	)
 
-const shouldMock = process.env.GITHUB_CLIENT_ID?.startsWith('MOCK_')
+const shouldMock =
+	process.env.GITHUB_CLIENT_ID?.startsWith('MOCK_') ||
+	process.env.NODE_ENV === 'test'
 
 export class GitHubProvider implements AuthProvider {
 	getAuthStrategy() {

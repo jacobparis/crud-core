@@ -64,8 +64,8 @@ export const lruCache = {
 		})
 		return value
 	},
-	get: key => lru.get(key),
-	delete: key => lru.delete(key),
+	get: (key) => lru.get(key),
+	delete: (key) => lru.delete(key),
 } satisfies Cache
 
 const cacheEntrySchema = z.object({
@@ -100,7 +100,6 @@ export const cache: CachifiedCache = {
 		return { metadata, value }
 	},
 	async set(key, entry) {
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		const { currentIsPrimary, primaryInstance } = await getInstanceInfo()
 		if (currentIsPrimary) {
 			cacheDb
@@ -117,7 +116,7 @@ export const cache: CachifiedCache = {
 			void updatePrimaryCacheValue({
 				key,
 				cacheValue: entry,
-			}).then(response => {
+			}).then((response) => {
 				if (!response.ok) {
 					console.error(
 						`Error updating cache value for key "${key}" on primary instance (${primaryInstance}): ${response.status} ${response.statusText}`,
@@ -136,7 +135,7 @@ export const cache: CachifiedCache = {
 			void updatePrimaryCacheValue({
 				key,
 				cacheValue: undefined,
-			}).then(response => {
+			}).then((response) => {
 				if (!response.ok) {
 					console.error(
 						`Error deleting cache value for key "${key}" on primary instance (${primaryInstance}): ${response.status} ${response.statusText}`,
@@ -152,7 +151,7 @@ export async function getAllCacheKeys(limit: number) {
 		sqlite: cacheDb
 			.prepare('SELECT key FROM cache LIMIT ?')
 			.all(limit)
-			.map(row => (row as { key: string }).key),
+			.map((row) => (row as { key: string }).key),
 		lru: [...lru.keys()],
 	}
 }
@@ -162,8 +161,8 @@ export async function searchCacheKeys(search: string, limit: number) {
 		sqlite: cacheDb
 			.prepare('SELECT key FROM cache WHERE key LIKE ? LIMIT ?')
 			.all(`%${search}%`, limit)
-			.map(row => (row as { key: string }).key),
-		lru: [...lru.keys()].filter(key => key.includes(search)),
+			.map((row) => (row as { key: string }).key),
+		lru: [...lru.keys()].filter((key) => key.includes(search)),
 	}
 }
 

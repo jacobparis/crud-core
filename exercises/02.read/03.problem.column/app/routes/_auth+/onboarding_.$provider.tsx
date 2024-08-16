@@ -83,7 +83,7 @@ async function requireData({
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
 	const { email } = await requireData({ request, params })
-	const authSession = await authSessionStorage.getSession(
+	const connectionSession = await connectionSessionStorage.getSession(
 		request.headers.get('cookie'),
 	)
 	const verifySession = await verifySessionStorage.getSession(
@@ -91,17 +91,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 	)
 	const prefilledProfile = verifySession.get(prefilledProfileKey)
 
-	const formError = authSession.get(authenticator.sessionErrorKey)
+	const formError = connectionSession.get(authenticator.sessionErrorKey)
+	const hasError = typeof formError === 'string'
 
 	return json({
 		email,
 		status: 'idle',
 		submission: {
-			status: 'error',
+			status: hasError ? 'error' : undefined,
 			initialValue: prefilledProfile ?? {},
-			error: {
-				'': typeof formError === 'string' ? [formError] : [],
-			},
+			error: { '': hasError ? [formError] : [] },
 		} as SubmissionResult,
 	})
 }
@@ -178,7 +177,7 @@ export const meta: MetaFunction = () => {
 	return [{ title: 'Setup Epic Notes Account' }]
 }
 
-export default function SignupRoute() {
+export default function OnboardingProviderRoute() {
 	const data = useLoaderData<typeof loader>()
 	const actionData = useActionData<typeof action>()
 	const isPending = useIsPending()

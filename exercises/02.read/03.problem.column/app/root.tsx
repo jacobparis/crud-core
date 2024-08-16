@@ -204,7 +204,12 @@ function App() {
 	useToast(data.toast)
 
 	return (
-		<Document nonce={nonce} theme={theme} env={data.ENV}>
+		<Document
+			nonce={nonce}
+			theme={theme}
+			env={data.ENV}
+			allowIndexing={allowIndexing}
+		>
 			<Outlet />
 			<EpicToaster closeButton position="top-center" theme={theme} />
 			<EpicProgress />
@@ -223,38 +228,6 @@ function AppWithProviders() {
 
 export default withSentry(AppWithProviders)
 
-/**
- * @returns the user's theme preference, or the client hint theme if the user
- * has not set a preference.
- */
-export function useTheme() {
-	const hints = useHints()
-	const requestInfo = useRequestInfo()
-	const optimisticMode = useOptimisticThemeMode()
-	if (optimisticMode) {
-		return optimisticMode === 'system' ? hints.theme : optimisticMode
-	}
-	return requestInfo.userPrefs.theme ?? hints.theme
-}
-
-/**
- * If the user's changing their theme mode preference, this will return the
- * value it's being changed to.
- */
-export function useOptimisticThemeMode() {
-	const fetchers = useFetchers()
-	const themeFetcher = fetchers.find(f => f.formAction === '/')
-
-	if (themeFetcher && themeFetcher.formData) {
-		const submission = parseWithZod(themeFetcher.formData, {
-			schema: ThemeFormSchema,
-		})
-
-		if (submission.status === 'success') {
-			return submission.value.theme
-		}
-	}
-}
 
 export function ErrorBoundary() {
 	// the nonce doesn't rely on the loader so we can access that

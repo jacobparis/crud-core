@@ -158,7 +158,7 @@ export default function SignupRoute() {
 					<ErrorList errors={form.errors} id={form.errorId} />
 					<StatusButton
 						className="w-full"
-						status={isPending ? 'pending' : form.status ?? 'idle'}
+						status={isPending ? 'pending' : (form.status ?? 'idle')}
 						type="submit"
 						disabled={isPending}
 					>
@@ -166,7 +166,7 @@ export default function SignupRoute() {
 					</StatusButton>
 				</Form>
 				<ul className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
-					{providerNames.map(providerName => (
+					{providerNames.map((providerName) => (
 						<li key={providerName}>
 							<ProviderConnectionForm
 								type="Signup"

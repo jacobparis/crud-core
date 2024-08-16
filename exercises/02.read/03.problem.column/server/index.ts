@@ -15,6 +15,9 @@ import morgan from 'morgan'
 installGlobals()
 
 const MODE = process.env.NODE_ENV ?? 'development'
+const IS_PROD = MODE === 'production'
+const IS_DEV = MODE === 'development'
+const ALLOW_INDEXING = process.env.ALLOW_INDEXING !== 'false'
 
 const createRequestHandler =
 	MODE === 'production'
@@ -67,8 +70,6 @@ app.use(compression())
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
 app.disable('x-powered-by')
 
-app.use(Sentry.Handlers.requestHandler())
-app.use(Sentry.Handlers.tracingHandler())
 
 if (viteDevServer) {
 	app.use(viteDevServer.middlewares)
@@ -144,14 +145,13 @@ app.use(
 // rate limiting because playwright tests are very fast and we don't want to
 // have to wait for the rate limit to reset between tests.
 const maxMultiple =
-	MODE !== 'production' || process.env.PLAYWRIGHT_TEST_BASE_URL ? 10_000 : 1
+	!IS_PROD || process.env.PLAYWRIGHT_TEST_BASE_URL ? 10_000 : 1
 const rateLimitDefault = {
 	windowMs: 60 * 1000,
 	max: 1000 * maxMultiple,
 	standardHeaders: true,
 	legacyHeaders: false,
-	// Fly.io prevents spoofing of X-Forwarded-For
-	// so no need to validate the trustProxy config
+
 	validate: { trustProxy: false },
 }
 
@@ -201,7 +201,7 @@ async function getBuild() {
 		? viteDevServer.ssrLoadModule('virtual:remix/server-build')
 		: // @ts-ignore this should exist before running the server
 		  // but it may not exist just yet.
-		  await import('#build/server/index.js')
+		  await import('../build/server/index.js')
 	// not sure how to make this happy 🤷‍♂️
 	return build as unknown as ServerBuild
 }
@@ -214,8 +214,7 @@ app.all(
 			serverBuild: getBuild(),
 		}),
 		mode: MODE,
-		// @sentry/remix needs to be updated to handle the function signature
-		build: MODE === 'production' ? await getBuild() : getBuild,
+		build: getBuild,
 	}),
 )
 
@@ -233,22 +232,22 @@ const server = app.listen(portToUse, () => {
 			? addy.port
 			: 0
 
-	if (portUsed !== desiredPort) {
+	if (!portAvailable) {
 		console.warn(
 			chalk.yellow(
-				`⚠️  Port ${desiredPort} is not available, using ${portUsed} instead.`,
+				`⚠️  Port ${desiredPort} is not available, using ${portToUse} instead.`,
 			),
 		)
 	}
 	console.log(`🚀  We have liftoff!`)
-	const localUrl = `http://localhost:${portUsed}`
+	const localUrl = `http://localhost:${portToUse}`
 	let lanUrl: string | null = null
 	const localIp = ipAddress() ?? 'Unknown'
 	// Check if the address is a private ip
 	// https://en.wikipedia.org/wiki/Private_network#Private_IPv4_address_spaces
 	// https://github.com/facebook/create-react-app/blob/d960b9e38c062584ff6cfb1a70e1512509a966e7/packages/react-dev-utils/WebpackDevServerUtils.js#LL48C9-L54C10
 	if (/^10[.]|^172[.](1[6-9]|2[0-9]|3[0-1])[.]|^192[.]168[.]/.test(localIp)) {
-		lanUrl = `http://${localIp}:${portUsed}`
+		lanUrl = `http://${localIp}:${portToUse}`
 	}
 
 	console.log(

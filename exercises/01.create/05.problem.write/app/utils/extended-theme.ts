@@ -90,7 +90,16 @@ export const extendedTheme = {
 		/** 12px size / 16px high / bold */
 		button: ['0.75rem', { lineHeight: '1rem', fontWeight: '700' }],
 	},
+	keyframes: {
+		'caret-blink': {
+			'0%,70%,100%': { opacity: '1' },
+			'20%,50%': { opacity: '0' },
+		},
+	},
 	boxShadow: {
 		smooth: 'rgba(0, 0, 0, 0.05) 0px 4px 44px',
+	},
+	animation: {
+		'caret-blink': 'caret-blink 1.25s ease-out infinite',
 	},
 } satisfies Config['theme']

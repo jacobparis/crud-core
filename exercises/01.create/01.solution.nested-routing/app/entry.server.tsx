@@ -39,7 +39,7 @@ export default async function handleRequest(...args: DocRequestArgs) {
 		? 'onAllReady'
 		: 'onShellReady'
 
-	const nonce = String(loadContext.cspNonce) ?? undefined
+	const nonce = loadContext.cspNonce?.toString() ?? ''
 	return new Promise(async (resolve, reject) => {
 		let didError = false
 		// NOTE: this timing will only include things that are rendered in the shell
@@ -66,10 +66,8 @@ export default async function handleRequest(...args: DocRequestArgs) {
 				onShellError: (err: unknown) => {
 					reject(err)
 				},
-				onError: (error: unknown) => {
+				onError: () => {
 					didError = true
-
-					console.error(error)
 				},
 				nonce,
 			},
