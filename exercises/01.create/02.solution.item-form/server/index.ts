@@ -1,7 +1,6 @@
 import crypto from 'crypto'
-import { createRequestHandler as _createRequestHandler } from '@remix-run/express'
-import { type ServerBuild, installGlobals } from '@remix-run/node'
-import * as Sentry from '@sentry/remix'
+import { createRequestHandler } from '@remix-run/express'
+import { type ServerBuild } from '@remix-run/node'
 import { ip as ipAddress } from 'address'
 import chalk from 'chalk'
 import closeWithGrace from 'close-with-grace'
@@ -12,23 +11,15 @@ import getPort, { portNumbers } from 'get-port'
 import helmet from 'helmet'
 import morgan from 'morgan'
 
-installGlobals()
-
 const MODE = process.env.NODE_ENV ?? 'development'
 
-const createRequestHandler =
-	MODE === 'production'
-		? Sentry.wrapExpressCreateRequestHandler(_createRequestHandler)
-		: _createRequestHandler
-
-const viteDevServer =
-	MODE === 'production'
-		? undefined
-		: await import('vite').then(vite =>
-				vite.createServer({
-					server: { middlewareMode: true },
-				}),
-		  )
+const viteDevServer = IS_PROD
+	? undefined
+	: await import('vite').then((vite) =>
+			vite.createServer({
+				server: { middlewareMode: true },
+			}),
+		)
 
 const app = express()
 
@@ -40,6 +31,8 @@ app.set('trust proxy', true)
 
 // ensure HTTPS only (X-Forwarded-Proto comes from Fly)
 app.use((req, res, next) => {
+	if (req.method !== 'GET') return next()
+
 	const proto = req.get('X-Forwarded-Proto')
 	const host = getHost(req)
 	if (proto === 'http') {
@@ -108,6 +101,7 @@ app.use((_, res, next) => {
 
 app.use(
 	helmet({
+		xPoweredBy: false,
 		referrerPolicy: { policy: 'same-origin' },
 		crossOriginEmbedderPolicy: true,
 		xFrameOptions: false,
@@ -153,6 +147,13 @@ const rateLimitDefault = {
 	// Fly.io prevents spoofing of X-Forwarded-For
 	// so no need to validate the trustProxy config
 	validate: { trustProxy: false },
+	// Malicious users can spoof their IP address which means we should not deault
+	// to trusting req.ip when hosted on Fly.io. However, users cannot spoof Fly-Client-Ip.
+	// When sitting behind a CDN such as cloudflare, replace fly-client-ip with the CDN
+	// specific header such as cf-connecting-ip
+	keyGenerator: (req: express.Request) => {
+		return req.get('fly-client-ip') ?? `${req.ip}`
+	},
 }
 
 const strongestRateLimit = rateLimit({
@@ -206,6 +207,13 @@ async function getBuild() {
 	return build as unknown as ServerBuild
 }
 
+if (!ALLOW_INDEXING) {
+	app.use((_, res, next) => {
+		res.set('X-Robots-Tag', 'noindex, nofollow')
+		next()
+	})
+}
+
 app.all(
 	'*',
 	createRequestHandler({
@@ -223,6 +231,11 @@ const desiredPort = Number(process.env.PORT || 3000)
 const portToUse = await getPort({
 	port: portNumbers(desiredPort, desiredPort + 100),
 })
+const portAvailable = desiredPort === portToUse
+if (!portAvailable && !IS_DEV) {
+	console.log(`⚠️ Port ${desiredPort} is not available.`)
+	process.exit(1)
+}
 
 const server = app.listen(portToUse, () => {
 	const addy = server.address()

@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+export const USERNAME_MIN_LENGTH = 3
+export const USERNAME_MAX_LENGTH = 20
+
 export const UsernameSchema = z
 	.string({ required_error: 'Username is required' })
 	.min(3, { message: 'Username is too short' })
