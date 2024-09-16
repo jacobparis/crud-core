@@ -3,6 +3,7 @@ import { sentryVitePlugin } from '@sentry/vite-plugin'
 import { glob } from 'glob'
 import { flatRoutes } from 'remix-flat-routes'
 import { defineConfig } from 'vite'
+import { envOnlyMacros } from 'vite-env-only'
 
 const MODE = process.env.NODE_ENV
 
@@ -11,59 +12,64 @@ export default defineConfig({
 		cssMinify: MODE === 'production',
 
 		rollupOptions: {
-			external: [/node:.*/, 'stream', 'crypto', 'fsevents'],
+			external: [/node:.*/, 'fsevents'],
 		},
 
 		assetsInlineLimit: (source: string) => {
-			if (source.endsWith('sprite.svg')) {
+			if (
+				source.endsWith('sprite.svg') ||
+				source.endsWith('favicon.svg') ||
+				source.endsWith('apple-touch-icon.png')
+			) {
 				return false
 			}
 		},
-
-		sourcemap: true,
 	},
 	server: {
-		watch: {
-			ignored: ['**/playwright-report/**'],
+		port: Number(process.env.PORT) || 3000,
+		host: process.env.HOST || 'localhost',
+		fs: {
+			allow: ['..'],
 		},
 	},
 	plugins: [
-		remix({
-			ignoredRouteFiles: ['**/*'],
-			serverModuleFormat: 'esm',
-			routes: async (defineRoutes) => {
-				return flatRoutes('routes', defineRoutes, {
-					ignoredRouteFiles: [
-						'.*',
-						'**/*.css',
-						'**/__*.*',
-						// This is for server-side utilities you want to colocate
-						// next to your routes without making an additional
-						// directory. If you need a route that includes "server" or
-						// "client" in the filename, use the escape brackets like:
-						// my-route.[server].tsx
-						'**/*.server.*',
-						'**/*.client.*',
-					],
-				})
-			},
-		}),
+		envOnlyMacros(),
+		process.env.NODE_ENV === 'test'
+			? null
+			: remix({
+					ignoredRouteFiles: ['**/*'],
+					serverModuleFormat: 'esm',
+					routes: async (defineRoutes) => {
+						return flatRoutes('routes', defineRoutes, {
+							ignoredRouteFiles: [
+								'.*',
+								'**/*.css',
+								'**/*.test.{js,jsx,ts,tsx}',
+								'**/__*.*',
+								// This is for server-side utilities you want to colocate
+								// next to your routes without making an additional
+								// directory. If you need a route that includes "server" or
+								// "client" in the filename, use the escape brackets like:
+								// my-route.[server].tsx
+								'**/*.server.*',
+								'**/*.client.*',
+							],
+						})
+					},
+				}),
 		process.env.SENTRY_AUTH_TOKEN
 			? sentryVitePlugin({
 					disable: MODE !== 'production',
-					authToken: process.env.SENTRY_AUTH_TOKEN,
 					org: process.env.SENTRY_ORG,
 					project: process.env.SENTRY_PROJECT,
+					authToken: process.env.SENTRY_AUTH_TOKEN,
 					release: {
 						name: process.env.COMMIT_SHA,
-						setCommits: {
-							auto: true,
-						},
 					},
 					sourcemaps: {
 						filesToDeleteAfterUpload: await glob([
-							'./build/**/*.map',
-							'.server-build/**/*.map',
+							'./build/client/**/*.js.map',
+							'./build/server/**/*.js.map',
 						]),
 					},
 				})
