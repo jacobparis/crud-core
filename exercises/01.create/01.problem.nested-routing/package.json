@@ -4,7 +4,8 @@
 	"sideEffects": false,
 	"type": "module",
 	"epic-stack": {
-		"head": "05d92de7e0ebd580edbf4bdd6b43447b32ece5e7"
+		"head": "f48da107d0161c70272ca069d77ac8ea95cd88bd",
+		"date": "2024-09-10T20:29:25Z"
 	},
 	"imports": {
 		"#app/*": "./app/*",
@@ -97,6 +98,7 @@
 		"tailwindcss": "^3.4.6",
 		"tailwindcss-animate": "^1.0.7",
 		"tailwindcss-radix": "^3.0.3",
+		"vite-env-only": "^3.0.3",
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {
