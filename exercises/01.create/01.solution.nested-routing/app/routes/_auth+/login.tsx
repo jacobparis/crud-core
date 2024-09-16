@@ -1,5 +1,6 @@
 import { getFormProps, getInputProps, useForm } from '@conform-to/react'
 import { getZodConstraint, parseWithZod } from '@conform-to/zod'
+import { type SEOHandle } from '@nasa-gcn/remix-seo'
 import {
 	json,
 	type ActionFunctionArgs,
@@ -22,6 +23,10 @@ import { checkHoneypot } from '#app/utils/honeypot.server.ts'
 import { useIsPending } from '#app/utils/misc.tsx'
 import { PasswordSchema, UsernameSchema } from '#app/utils/user-validation.ts'
 import { handleNewSession } from './login.server.ts'
+
+export const handle: SEOHandle = {
+	getSitemapEntries: () => null,
+}
 
 const LoginFormSchema = z.object({
 	username: UsernameSchema,
